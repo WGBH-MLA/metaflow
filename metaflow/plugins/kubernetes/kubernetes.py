@@ -16,7 +16,9 @@ from metaflow.metaflow_config import (
     ARGO_EVENTS_WEBHOOK_AUTH,
     ARGO_WORKFLOWS_KUBERNETES_SECRETS,
     ARGO_WORKFLOWS_ENV_VARS_TO_SKIP,
+    AWS_SECRETS_MANAGER_CLIENT_PARAMS,
     AWS_SECRETS_MANAGER_DEFAULT_REGION,
+    AWS_SECRETS_MANAGER_SESSION_VARS,
     AZURE_KEY_VAULT_PREFIX,
     AZURE_STORAGE_BLOB_SERVICE_ENDPOINT,
     CARD_AZUREROOT,
@@ -308,6 +310,17 @@ class Kubernetes(object):
             # see get_datastore_root_from_config in datastore/local.py).
         )
 
+        if AWS_SECRETS_MANAGER_SESSION_VARS:
+            jobset.environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_SESSION_VARS",
+                json.dumps(AWS_SECRETS_MANAGER_SESSION_VARS),
+            )
+        if AWS_SECRETS_MANAGER_CLIENT_PARAMS:
+            jobset.environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_CLIENT_PARAMS",
+                json.dumps(AWS_SECRETS_MANAGER_CLIENT_PARAMS),
+            )
+
         for k in list(
             [] if not secrets else [secrets] if isinstance(secrets, str) else secrets
         ) + KUBERNETES_SECRETS.split(","):
@@ -323,6 +336,17 @@ class Kubernetes(object):
                 "METAFLOW_KUBERNETES_NODE_IP": "status.hostIP",
             }
         )
+
+        if AWS_SECRETS_MANAGER_SESSION_VARS:
+            job.environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_SESSION_VARS",
+                json.dumps(AWS_SECRETS_MANAGER_SESSION_VARS),
+            )
+        if AWS_SECRETS_MANAGER_CLIENT_PARAMS:
+            job.environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_CLIENT_PARAMS",
+                json.dumps(AWS_SECRETS_MANAGER_CLIENT_PARAMS),
+            )
 
         # Temporary passing of *some* environment variables. Do not rely on this
         # mechanism as it will be removed in the near future
