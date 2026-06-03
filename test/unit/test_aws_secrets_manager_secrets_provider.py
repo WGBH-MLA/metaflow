@@ -38,7 +38,9 @@ def test_aws_secrets_manager_uses_global_session_vars_and_client_params(mocker):
     )
 
 
-def test_aws_secrets_manager_options_override_global_session_vars_and_client_params(mocker):
+def test_aws_secrets_manager_options_override_global_session_vars_and_client_params(
+    mocker,
+):
     provider = AwsSecretsManagerSecretsProvider()
     mock_client = mocker.Mock()
     mock_client.get_secret_value.return_value = {
