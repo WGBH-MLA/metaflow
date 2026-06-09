@@ -28,6 +28,8 @@ from metaflow.metaflow_config import (
     DATASTORE_SYSROOT_GS,
     DATASTORE_SYSROOT_S3,
     DATATOOLS_S3ROOT,
+    DATATOOLS_CLIENT_PARAMS,
+    DATATOOLS_SESSION_VARS,
     DEFAULT_AWS_CLIENT_PROVIDER,
     DEFAULT_GCP_CLIENT_PROVIDER,
     DEFAULT_METADATA,
@@ -245,6 +247,14 @@ class Kubernetes(object):
             .environment_variable(
                 "METAFLOW_SERVICE_HEADERS",
                 json.dumps(SERVICE_HEADERS),
+            )
+            .environment_variable(
+                "METAFLOW_DATATOOLS_CLIENT_PARAMS",
+                json.dumps(DATATOOLS_CLIENT_PARAMS),
+            )
+            .environment_variable(
+                "METAFLOW_DATATOOLS_SESSION_VARS",
+                json.dumps(DATATOOLS_SESSION_VARS),
             )
             .environment_variable("METAFLOW_DATASTORE_SYSROOT_S3", DATASTORE_SYSROOT_S3)
             .environment_variable("METAFLOW_DATATOOLS_S3ROOT", DATATOOLS_S3ROOT)
@@ -581,6 +591,14 @@ class Kubernetes(object):
             )
             .environment_variable("METAFLOW_DATASTORE_SYSROOT_S3", DATASTORE_SYSROOT_S3)
             .environment_variable("METAFLOW_DATATOOLS_S3ROOT", DATATOOLS_S3ROOT)
+            .environment_variable(
+                "METAFLOW_DATATOOLS_CLIENT_PARAMS",
+                json.dumps(DATATOOLS_CLIENT_PARAMS),
+            )
+            .environment_variable(
+                "METAFLOW_DATATOOLS_SESSION_VARS",
+                json.dumps(DATATOOLS_SESSION_VARS),
+            )
             .environment_variable("METAFLOW_DEFAULT_DATASTORE", self._datastore.TYPE)
             .environment_variable("METAFLOW_DEFAULT_METADATA", DEFAULT_METADATA)
             .environment_variable("METAFLOW_KUBERNETES_WORKLOAD", 1)
