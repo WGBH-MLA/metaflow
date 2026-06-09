@@ -603,6 +603,14 @@ class Kubernetes(object):
                 AWS_SECRETS_MANAGER_DEFAULT_REGION,
             )
             .environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_CLIENT_PARAMS",
+                json.dumps(AWS_SECRETS_MANAGER_CLIENT_PARAMS),
+            )
+            .environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_SESSION_VARS",
+                json.dumps(AWS_SECRETS_MANAGER_SESSION_VARS),
+            )   
+            .environment_variable(
                 "METAFLOW_GCP_SECRET_MANAGER_PREFIX", GCP_SECRET_MANAGER_PREFIX
             )
             .environment_variable(
