@@ -16,7 +16,9 @@ from metaflow.metaflow_config import (
     ARGO_EVENTS_WEBHOOK_AUTH,
     ARGO_WORKFLOWS_KUBERNETES_SECRETS,
     ARGO_WORKFLOWS_ENV_VARS_TO_SKIP,
+    AWS_SECRETS_MANAGER_CLIENT_PARAMS,
     AWS_SECRETS_MANAGER_DEFAULT_REGION,
+    AWS_SECRETS_MANAGER_SESSION_VARS,
     AZURE_KEY_VAULT_PREFIX,
     AZURE_STORAGE_BLOB_SERVICE_ENDPOINT,
     CARD_AZUREROOT,
@@ -26,6 +28,8 @@ from metaflow.metaflow_config import (
     DATASTORE_SYSROOT_GS,
     DATASTORE_SYSROOT_S3,
     DATATOOLS_S3ROOT,
+    DATATOOLS_CLIENT_PARAMS,
+    DATATOOLS_SESSION_VARS,
     DEFAULT_AWS_CLIENT_PROVIDER,
     DEFAULT_GCP_CLIENT_PROVIDER,
     DEFAULT_METADATA,
@@ -244,6 +248,14 @@ class Kubernetes(object):
                 "METAFLOW_SERVICE_HEADERS",
                 json.dumps(SERVICE_HEADERS),
             )
+            .environment_variable(
+                "METAFLOW_DATATOOLS_CLIENT_PARAMS",
+                json.dumps(DATATOOLS_CLIENT_PARAMS),
+            )
+            .environment_variable(
+                "METAFLOW_DATATOOLS_SESSION_VARS",
+                json.dumps(DATATOOLS_SESSION_VARS),
+            )
             .environment_variable("METAFLOW_DATASTORE_SYSROOT_S3", DATASTORE_SYSROOT_S3)
             .environment_variable("METAFLOW_DATATOOLS_S3ROOT", DATATOOLS_S3ROOT)
             .environment_variable("METAFLOW_DEFAULT_DATASTORE", self._datastore.TYPE)
@@ -308,6 +320,17 @@ class Kubernetes(object):
             # see get_datastore_root_from_config in datastore/local.py).
         )
 
+        if AWS_SECRETS_MANAGER_SESSION_VARS:
+            jobset.environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_SESSION_VARS",
+                json.dumps(AWS_SECRETS_MANAGER_SESSION_VARS),
+            )
+        if AWS_SECRETS_MANAGER_CLIENT_PARAMS:
+            jobset.environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_CLIENT_PARAMS",
+                json.dumps(AWS_SECRETS_MANAGER_CLIENT_PARAMS),
+            )
+
         for k in list(
             [] if not secrets else [secrets] if isinstance(secrets, str) else secrets
         ) + KUBERNETES_SECRETS.split(","):
@@ -323,6 +346,17 @@ class Kubernetes(object):
                 "METAFLOW_KUBERNETES_NODE_IP": "status.hostIP",
             }
         )
+
+        if AWS_SECRETS_MANAGER_SESSION_VARS:
+            job.environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_SESSION_VARS",
+                json.dumps(AWS_SECRETS_MANAGER_SESSION_VARS),
+            )
+        if AWS_SECRETS_MANAGER_CLIENT_PARAMS:
+            job.environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_CLIENT_PARAMS",
+                json.dumps(AWS_SECRETS_MANAGER_CLIENT_PARAMS),
+            )
 
         # Temporary passing of *some* environment variables. Do not rely on this
         # mechanism as it will be removed in the near future
@@ -557,6 +591,14 @@ class Kubernetes(object):
             )
             .environment_variable("METAFLOW_DATASTORE_SYSROOT_S3", DATASTORE_SYSROOT_S3)
             .environment_variable("METAFLOW_DATATOOLS_S3ROOT", DATATOOLS_S3ROOT)
+            .environment_variable(
+                "METAFLOW_DATATOOLS_CLIENT_PARAMS",
+                json.dumps(DATATOOLS_CLIENT_PARAMS),
+            )
+            .environment_variable(
+                "METAFLOW_DATATOOLS_SESSION_VARS",
+                json.dumps(DATATOOLS_SESSION_VARS),
+            )
             .environment_variable("METAFLOW_DEFAULT_DATASTORE", self._datastore.TYPE)
             .environment_variable("METAFLOW_DEFAULT_METADATA", DEFAULT_METADATA)
             .environment_variable("METAFLOW_KUBERNETES_WORKLOAD", 1)
@@ -578,6 +620,14 @@ class Kubernetes(object):
                 "METAFLOW_AWS_SECRETS_MANAGER_DEFAULT_REGION",
                 AWS_SECRETS_MANAGER_DEFAULT_REGION,
             )
+            .environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_CLIENT_PARAMS",
+                json.dumps(AWS_SECRETS_MANAGER_CLIENT_PARAMS),
+            )
+            .environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_SESSION_VARS",
+                json.dumps(AWS_SECRETS_MANAGER_SESSION_VARS),
+            )   
             .environment_variable(
                 "METAFLOW_GCP_SECRET_MANAGER_PREFIX", GCP_SECRET_MANAGER_PREFIX
             )

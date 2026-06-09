@@ -5,8 +5,10 @@ from json import JSONDecodeError
 
 from metaflow.exception import MetaflowException
 from metaflow.metaflow_config import (
+    AWS_SECRETS_MANAGER_CLIENT_PARAMS,
     AWS_SECRETS_MANAGER_DEFAULT_REGION,
     AWS_SECRETS_MANAGER_DEFAULT_ROLE,
+    AWS_SECRETS_MANAGER_SESSION_VARS,
 )
 from metaflow.plugins.secrets import SecretsProvider
 import re
@@ -70,6 +72,7 @@ class AwsSecretsManagerSecretsProvider(SecretsProvider):
 
         :param secret_id: ARN or friendly name of the secret.
         :param options: Dictionary of additional options. E.g., `options={"env_var_name": custom_env_var_name}`.
+            Supports `session_vars` and `client_params` to override global AWS Secrets Manager settings.
         :param role: AWS IAM Role ARN to assume before reading the secret.
         :return: Dictionary of environment variables. All keys and values are strings.
         """
@@ -87,6 +90,14 @@ class AwsSecretsManagerSecretsProvider(SecretsProvider):
         else:
             effective_aws_region = AWS_SECRETS_MANAGER_DEFAULT_REGION
 
+        effective_session_vars = dict(AWS_SECRETS_MANAGER_SESSION_VARS or {})
+        effective_session_vars.update(options.get("session_vars") or {})
+
+        effective_client_params = dict(AWS_SECRETS_MANAGER_CLIENT_PARAMS or {})
+        effective_client_params.update(options.get("client_params") or {})
+        if m or "region" in options or "region_name" not in effective_client_params:
+            effective_client_params["region_name"] = effective_aws_region
+
         # At the end of all that, `effective_aws_region` may still be None.
         # This might still be OK, if there is fallback AWS region info in environment like:
         # .aws/config or AWS_REGION env var or AWS_DEFAULT_REGION env var, etc.
@@ -96,7 +107,8 @@ class AwsSecretsManagerSecretsProvider(SecretsProvider):
 
             secrets_manager_client = get_aws_client(
                 "secretsmanager",
-                client_params={"region_name": effective_aws_region},
+                session_vars=effective_session_vars,
+                client_params=effective_client_params,
                 role_arn=role,
             )
         except botocore.exceptions.NoRegionError:
