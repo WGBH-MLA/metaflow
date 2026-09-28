@@ -11,6 +11,7 @@ from metaflow.plugins.datatools.s3.s3tail import S3Tail
 from metaflow.plugins.aws.aws_utils import sanitize_batch_tag
 from metaflow.exception import MetaflowException
 from metaflow.metaflow_config import (
+    AWS_SECRETS_MANAGER_CLIENT_PARAMS,
     OTEL_ENDPOINT,
     OTEL_SERVICE_NAME,
     SERVICE_INTERNAL_URL,
@@ -23,6 +24,7 @@ from metaflow.metaflow_config import (
     S3_ENDPOINT_URL,
     DEFAULT_SECRETS_BACKEND_TYPE,
     AWS_SECRETS_MANAGER_DEFAULT_REGION,
+    AWS_SECRETS_MANAGER_SESSION_VARS,
     S3_SERVER_SIDE_ENCRYPTION,
 )
 
@@ -352,6 +354,16 @@ class Batch(object):
             job.environment_variable(
                 "METAFLOW_AWS_SECRETS_MANAGER_DEFAULT_REGION",
                 AWS_SECRETS_MANAGER_DEFAULT_REGION,
+            )
+        if AWS_SECRETS_MANAGER_SESSION_VARS:
+            job.environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_SESSION_VARS",
+                json.dumps(AWS_SECRETS_MANAGER_SESSION_VARS),
+            )
+        if AWS_SECRETS_MANAGER_CLIENT_PARAMS:
+            job.environment_variable(
+                "METAFLOW_AWS_SECRETS_MANAGER_CLIENT_PARAMS",
+                json.dumps(AWS_SECRETS_MANAGER_CLIENT_PARAMS),
             )
 
         tmpfs_enabled = use_tmpfs or (tmpfs_size and not use_tmpfs)
