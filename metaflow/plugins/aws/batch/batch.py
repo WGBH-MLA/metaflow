@@ -13,6 +13,7 @@ from metaflow.exception import MetaflowException
 from metaflow.metaflow_config import (
     AWS_SECRETS_MANAGER_CLIENT_PARAMS,
     OTEL_ENDPOINT,
+    OTEL_SERVICE_NAME,
     SERVICE_INTERNAL_URL,
     DATATOOLS_S3ROOT,
     DATASTORE_SYSROOT_S3,
@@ -335,6 +336,7 @@ class Batch(object):
             .environment_variable("METAFLOW_DEFAULT_METADATA", DEFAULT_METADATA)
             .environment_variable("METAFLOW_CARD_S3ROOT", CARD_S3ROOT)
             .environment_variable("METAFLOW_OTEL_ENDPOINT", OTEL_ENDPOINT)
+            .environment_variable("METAFLOW_OTEL_SERVICE_NAME", OTEL_SERVICE_NAME)
             .environment_variable("METAFLOW_RUNTIME_ENVIRONMENT", "aws-batch")
         )
 
